@@ -7,14 +7,23 @@
  * between stories uses vim key bindings j,k. Kill a story
  * and never see it again using x.
  *
- * TODO: enter to open story link
- * TODO: c to read comments
  * TODO: precache selected stories?
+ * TODO: open stuff async in iframes?
+ * TODO: remember highlighted position?
+ *  this makes it easier when browsing to read an article and then
+ *  hit the browser back button to return to HN
+ *  TODO: killfile - kill stories via regex, eg, no SOPA, etc.
  *
  * other scripts that do this:
  * http://news.ycombinator.com/item?id=277099
  * http://www.hnsearch.com/search#request/submissions&q=hacker+bookmarklet&start=0
  * 
+ * BUG: can't remove articles that have been voted up. Also affects
+ *  stories that are 'system' and can't be voted on.
+ * BUG: browsing to articles that have been upvoted results in 
+ *  viewing the submitter's profile rather than the intended action
+ * BUG: Voting a story up and then trying to browse to another story
+ *  results in trying to vote for the same story again.
  */
 
 /**
@@ -26,12 +35,12 @@
  */
 document.addEventListener( 'keypress', onKeydown, false ); 
 
-var tables = document.getElementsByTagName( 'table' );
-var currentrow = tables[2].firstChild.firstChild;
-killstories();
-var currentrow = tables[2].firstChild.firstChild;
-highlight( currentrow );
+// the row that is in focus for operations
+var currentrow;
 
+killstories();
+currentrow = findFirstRow();
+highlight( currentrow );
 
 /**
  * remove items from the page when first loaded. We assume 30 items
@@ -39,6 +48,9 @@ highlight( currentrow );
  * storage data.
  */
 function killstories() {
+	// start at the top
+	currentrow = findFirstRow();
+
 	for( var i=0; i<30; i++ ) {
 		var killrow = currentrow;
 		moveDown();
@@ -86,11 +98,20 @@ function resetList() {
 }
 
 /**
+ * return the <tr> element that represents the top of
+ *  the stories list
+ */
+function findFirstRow() {
+	var tables = document.getElementsByTagName( 'table' );
+	return tables[2].firstChild.firstChild;
+}
+
+/**
  * Handler for key commands, currently j,k,x
  */
 function onKeydown( evt ) {
 	// TODO: in opera the keycodes are funny
-	// alert( evt.keyCode );
+	console.log( evt.keyCode );
 	
 	// j - move down
 	if( evt.keyCode == 106 ) {
@@ -112,6 +133,16 @@ function onKeydown( evt ) {
 	else if( evt.keyCode == 120) {
 		kill();
 	}
+
+	// enter - browse to story 
+	else if( evt.keyCode == 13 ) {
+		browse();
+	}
+
+	// 'c' - read comments 
+	else if( evt.keyCode == 99 ) {
+		comments();
+	}
 }
 
 /**
@@ -131,6 +162,30 @@ function kill() {
 	currentrow.parentNode.removeChild( currentrow.previousSibling );
 	currentrow.parentNode.removeChild( currentrow.previousSibling );
 	currentrow.parentNode.removeChild( currentrow.previousSibling );
+}
+
+/**
+ * Used by 'enter' command to browse to a story 
+ */
+function browse() {
+	// big hairy dom traversal - we have to go specifically to third 
+	// child rather than just pulling all anchor elements since if a 
+	// story is voted up, the link count will be off.
+	var link = currentrow.children[2].getElementsByTagName( 'a' )[0].href;
+	window.location = link;
+}
+
+/**
+ * Used by 'c' command to browse to comments 
+ */
+function comments() {
+	// the comments are in the 'subtext' line, which immediately follows
+	// the main subject line and consists
+	// of 3 links always (I think, if you flag a story, the link is replaced
+	// by an 'unflag' option, so the number of links is consistent.)
+	// the third link goes to the comments for the story.
+	var link = currentrow.nextSibling.getElementsByTagName( 'a' )[2].href;
+	window.location = link;
 }
 
 /**
