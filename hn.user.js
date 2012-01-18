@@ -4,15 +4,18 @@
 
 /***
  * User script for navigating Hacker News. Moving up and down
- * between stories uses vim key bindings j,k. Kill a story
- * and never see it again using x.
+ *  between stories uses vim key bindings j,k. Kill a story
+ *  and never see it again using x. Killed stories are tracked in 
+ *  HTML5 LocalStorage, so clearing it will bring back all stories.
+ *  Open c,enter browses to comments/link respectively.
  *
  * TODO: precache selected stories?
  * TODO: open stuff async in iframes?
  * TODO: remember highlighted position?
  *  this makes it easier when browsing to read an article and then
  *  hit the browser back button to return to HN
- *  TODO: killfile - kill stories via regex, eg, no SOPA, etc.
+ * TODO: killfile - kill stories via regex, eg, no SOPA, etc.
+ * TODO: abstract DOM traversals a bit more, move to functions
  *
  * other scripts that do this:
  * http://news.ycombinator.com/item?id=277099
@@ -24,10 +27,11 @@
  *  viewing the submitter's profile rather than the intended action
  * BUG: Voting a story up and then trying to browse to another story
  *  results in trying to vote for the same story again.
+ * BUG: Key commands should be disabled when commenting
  */
 
 /**
- * Main code
+ * Main 
  *
  * Set up key handler and run the kill process for stories that 
  * have been killed previously. Take care of highlighting the 
