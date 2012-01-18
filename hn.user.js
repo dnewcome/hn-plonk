@@ -16,6 +16,7 @@
  *  hit the browser back button to return to HN
  * TODO: killfile - kill stories via regex, eg, no SOPA, etc.
  * TODO: abstract DOM traversals a bit more, move to functions
+ * TODO: support for user ids in plonk filter
  *
  * other scripts that do this:
  * http://news.ycombinator.com/item?id=277099
@@ -37,11 +38,14 @@
  * have been killed previously. Take care of highlighting the 
  * and setting the current row to the first visible story
  */
+console.log( 'running user script for hacker news' );
 document.addEventListener( 'keypress', onKeydown, false ); 
 
 // the row that is in focus for operations
 var currentrow;
 
+addPlonkLink( 'plonk', modifyPlonkList );
+addPlonkLink( 'reset', resetList );
 killstories();
 currentrow = findFirstRow();
 highlight( currentrow );
@@ -58,11 +62,26 @@ function killstories() {
 	for( var i=0; i<30; i++ ) {
 		var killrow = currentrow;
 		moveDown();
+
+		// check if story was killed by id
 		var id = killrow.getElementsByTagName( 'a' )[0].id;
 		var item = localStorage.getItem( id );
 		if( item ) {
 			console.log( 'removing ' + id );
 			removeRow( killrow );			
+		}
+		
+		// check if story matches plonk
+		var title = killrow.getElementsByTagName( 'a' )[1].innerHTML;
+		var plonk = ( localStorage.getItem( 'plonk' ) || '' ).split( ' ' );
+		for( var j=0; j<plonk.length; j++ ) {
+			console.log( plonk[j] );
+			if( plonk[j] != '' && title.match( new RegExp( plonk[j], 'i' ) ) ) {
+				console.log( 'removing ' + id );
+				removeRow( killrow );			
+				// once we match, we're done
+				break;
+			}
 		}
 	}
 }
@@ -99,6 +118,7 @@ function unhighlight( el ) {
  */
 function resetList() {
 	localStorage.clear();
+	window.location.reload();
 }
 
 /**
@@ -202,3 +222,28 @@ function removeRow( el ) {
 	el.parentNode.removeChild( el );
 }
 
+/**
+ * Insert link in page header for killfile list
+ */
+function addPlonkLink( text, func ) {
+	var header = document.getElementsByClassName( 'pagetop' )[0];
+	var separator = document.createTextNode( ' | ' );
+	var link = document.createElement( 'a' );
+	link.innerHTML = text;
+	link.href = '#';
+	link.addEventListener( 'click', func, false );
+	header.appendChild( separator )
+	header.appendChild( link )
+}
+
+/**
+ * Show dialog for adding to plonk list, save list to local
+ * storage
+ */
+function modifyPlonkList() {
+	console.log( 'plonk list' );
+	var plonk = localStorage.getItem( 'plonk' );
+	plonk = prompt( "Enter space separated list of kill terms", plonk ) || plonk;
+	console.log( plonk );
+	localStorage.setItem( 'plonk', plonk );
+}
