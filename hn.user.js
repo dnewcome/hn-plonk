@@ -14,7 +14,6 @@
  * TODO: remember highlighted position?
  *  this makes it easier when browsing to read an article and then
  *  hit the browser back button to return to HN
- * TODO: killfile - kill stories via regex, eg, no SOPA, etc.
  * TODO: abstract DOM traversals a bit more, move to functions
  * TODO: support for user ids in plonk filter
  * TODO: scroll down when moving selection below the fold
