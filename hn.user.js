@@ -1,5 +1,5 @@
 // ==UserScript==
-// @match news.ycombinator.com 
+// @match http://news.ycombinator.com/*
 // ==/UserScript==
 
 /***
