@@ -30,9 +30,9 @@
  *  results in trying to vote for the same story again.
  * BUG: Key commands should be disabled when commenting
  *
- * PRIORITYBUG: Articles that don't have upvote arrow (system msgs, voted
- *  articles, break the plonk process. Anything following the article
- *  won't get killed.
+ * Browser support -
+ *  Tested now on Opera, Firefox and Chrome. Voting function only works 
+ *  correctly in Opera due to tighter security restrictions elsewhere.
  */
 
 /**
@@ -150,11 +150,13 @@ function findFirstRow() {
  * Handler for key commands, currently j,k,x
  */
 function onKeydown( evt ) {
-	// TODO: in opera the keycodes are funny
-	console.log( evt.keyCode );
-	
+	console.log( evt.keyCode + ' ' + evt.charCode );
+	// firefox uses charCodes for printable chars
+	// keyCode will be 0. TODO: should try to do this the right way
+	var keyCode = evt.keyCode == 0 ? evt.charCode : evt.keyCode;	
+
 	// j - move down
-	if( evt.keyCode == 106 ) {
+	if( keyCode == 106 ) {
 		// TODO: logic for detecting end of page doesn't work 
 		if( currentrow.nextSibling.nextSibling.nextSibling != null ) {
 			moveDown();
@@ -162,7 +164,7 @@ function onKeydown( evt ) {
 	}
 	
 	// k - move up
-	else if( evt.keyCode == 107 ) {
+	else if( keyCode == 107 ) {
 		// check if we are at the top
 		if( currentrow.previousSibling != null ) {
 			moveUp();
@@ -170,21 +172,21 @@ function onKeydown( evt ) {
 	}
 
 	// x - kill story
-	else if( evt.keyCode == 120) {
+	else if( keyCode == 120) {
 		kill();
 	}
 
 	// enter - browse to story 
-	else if( evt.keyCode == 13 ) {
+	else if( keyCode == 13 ) {
 		browse();
 	}
 
 	// 'c' - read comments 
-	else if( evt.keyCode == 99 ) {
+	else if( keyCode == 99 ) {
 		comments();
 	}
 	// 'v' - vote 
-	else if( evt.keyCode == 118 ) {
+	else if( keyCode == 118 ) {
 		uservote();
 	}
 }
