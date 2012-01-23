@@ -19,29 +19,32 @@ user.js scripts from. Specify the directory and just drop hn.user.js there and O
 
 HN Plonk uses VIM-style keyboard commands in addition to adding three new links at the top of the page. The links are 
 
-kill - prompts you to enter a space-separated list of kill filters that operate on the story title. 
+### kill 
+Prompts you to enter a space-separated list of kill filters that operate on the story title. 
 These are treated as regular expressions and may not contain space characters.
 
-plonk - same as kill, but filters on HN user id. These must be full ids, no partial matches, and these are not
+### plonk 
+Same as kill, but filters on HN user id. These must be full ids, no partial matches, and these are not
 treated as regular expressions. 
 
-reset - clears local storage for news.ycombinator.com, effectively clearing all filters.
+### reset 
+Clears local storage for news.ycombinator.com, effectively clearing all filters.
 
 The key commands are:
 
-## x 
+### x 
 Kill an individual story. This stores the story ID in HTML5 local storage. When Hacker News loads, the 
 HN Plonk compares the stories with the kill list and removes any matches from the page.
 
-## j/k 
+### j/k 
 Move up and down in the list. The current story will be highlighted with a white background.
 
-## enter 
+### enter 
 Read the story. Browses away from Hacker News.
 
-## c 
+### c 
 Read comments for the selected story.
 
-## v 
+### v 
 Vote the story up. This only works in Opera currently due to security restrictions in Chrome/FF.
 
