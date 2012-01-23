@@ -18,6 +18,7 @@
  * TODO: abstract DOM traversals a bit more, move to functions
  * TODO: support for user ids in plonk filter
  * TODO: scroll down when moving selection below the fold
+ * TODO: Temporarily disable killed stories, to ressurect?
  *
  * other scripts that do this:
  * http://news.ycombinator.com/item?id=277099
