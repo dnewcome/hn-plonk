@@ -29,14 +29,19 @@ reset - clears local storage for news.ycombinator.com, effectively clearing all 
 
 The key commands are:
 
-x - Kill an individual story. This stores the story ID in HTML5 local storage. When Hacker News loads, the 
+## x 
+Kill an individual story. This stores the story ID in HTML5 local storage. When Hacker News loads, the 
 HN Plonk compares the stories with the kill list and removes any matches from the page.
 
-j/k - move up and down in the list. The current story will be highlighted with a white background.
+## j/k 
+Move up and down in the list. The current story will be highlighted with a white background.
 
-enter - read the story. Browses away from Hacker News.
+## enter 
+Read the story. Browses away from Hacker News.
 
-c - read comments for the selected story.
+## c 
+Read comments for the selected story.
 
-v - vote the story up. This only works in Opera currently due to security restrictions in Chrome/FF.
+## v 
+Vote the story up. This only works in Opera currently due to security restrictions in Chrome/FF.
 
