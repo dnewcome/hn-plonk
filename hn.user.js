@@ -17,18 +17,21 @@
  * TODO: killfile - kill stories via regex, eg, no SOPA, etc.
  * TODO: abstract DOM traversals a bit more, move to functions
  * TODO: support for user ids in plonk filter
+ * TODO: scroll down when moving selection below the fold
  *
  * other scripts that do this:
  * http://news.ycombinator.com/item?id=277099
  * http://www.hnsearch.com/search#request/submissions&q=hacker+bookmarklet&start=0
  * 
- * BUG: can't remove articles that have been voted up. Also affects
- *  stories that are 'system' and can't be voted on.
  * BUG: browsing to articles that have been upvoted results in 
  *  viewing the submitter's profile rather than the intended action
  * BUG: Voting a story up and then trying to browse to another story
  *  results in trying to vote for the same story again.
  * BUG: Key commands should be disabled when commenting
+ *
+ * PRIORITYBUG: Articles that don't have upvote arrow (system msgs, voted
+ *  articles, break the plonk process. Anything following the article
+ *  won't get killed.
  */
 
 /**
@@ -61,26 +64,38 @@ function killstories() {
 
 	for( var i=0; i<30; i++ ) {
 		var killrow = currentrow;
+		var id = null;
 		moveDown();
-
-		// check if story was killed by id
-		var id = killrow.getElementsByTagName( 'a' )[0].id;
+		
+		if( killrow.getElementsByTagName( 'a' )[0] ) {
+			var id = killrow.getElementsByTagName( 'a' )[0].id;
+		}
 		var item = localStorage.getItem( id );
-		if( item ) {
+
+		// if an item doesn't have a vote flag, kill it. It is already 
+		// voted or is a system message
+		if( !id ) {
+			console.log( 'removing item without voting link' );
+			removeRow( killrow );			
+		}
+		// check if story was killed by id
+		else if( item ) {
 			console.log( 'removing ' + id );
 			removeRow( killrow );			
 		}
 		
-		// check if story matches plonk
-		var title = killrow.getElementsByTagName( 'a' )[1].innerHTML;
-		var plonk = ( localStorage.getItem( 'plonk' ) || '' ).split( ' ' );
-		for( var j=0; j<plonk.length; j++ ) {
-			console.log( plonk[j] );
-			if( plonk[j] != '' && title.match( new RegExp( plonk[j], 'i' ) ) ) {
-				console.log( 'removing ' + id );
-				removeRow( killrow );			
-				// once we match, we're done
-				break;
+		else {
+			// check if story matches plonk
+			var title = killrow.getElementsByTagName( 'a' )[1].innerHTML;
+			var plonk = ( localStorage.getItem( 'plonk' ) || '' ).split( ' ' );
+			for( var j=0; j<plonk.length; j++ ) {
+				console.log( plonk[j] );
+				if( plonk[j] != '' && title.match( new RegExp( plonk[j], 'i' ) ) ) {
+					console.log( 'removing ' + id );
+					removeRow( killrow );			
+					// once we match, we're done
+					break;
+				}
 			}
 		}
 	}
