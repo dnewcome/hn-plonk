@@ -15,7 +15,6 @@
  *  this makes it easier when browsing to read an article and then
  *  hit the browser back button to return to HN
  * TODO: abstract DOM traversals a bit more, move to functions
- * TODO: support for user ids in plonk filter
  * TODO: scroll down when moving selection below the fold
  * TODO: Temporarily disable killed stories, to ressurect?
  *
@@ -47,6 +46,7 @@ document.addEventListener( 'keypress', onKeydown, false );
 // the row that is in focus for operations
 var currentrow;
 
+addPlonkLink( 'kill', modifyKillList );
 addPlonkLink( 'plonk', modifyPlonkList );
 addPlonkLink( 'reset', resetList );
 killstories();
@@ -70,6 +70,7 @@ function killstories() {
 		if( killrow.getElementsByTagName( 'a' )[0] ) {
 			var id = killrow.getElementsByTagName( 'a' )[0].id;
 		}
+		console.log( 'story id ' + id );
 		var item = localStorage.getItem( id );
 
 		// if an item doesn't have a vote flag, kill it. It is already 
@@ -85,18 +86,36 @@ function killstories() {
 		}
 		
 		else {
-			// check if story matches plonk
+			// check if story matches killfile 
 			var title = killrow.getElementsByTagName( 'a' )[1].innerHTML;
+			var kill = ( localStorage.getItem( 'kill' ) || '' ).split( ' ' );
+
+			// check if story matches plonkfile 
+			var user = killrow.nextSibling.getElementsByTagName( 'a' )[0].innerHTML;
+			console.log( 'looking at user ' + user );
 			var plonk = ( localStorage.getItem( 'plonk' ) || '' ).split( ' ' );
-			for( var j=0; j<plonk.length; j++ ) {
-				console.log( plonk[j] );
-				if( plonk[j] != '' && title.match( new RegExp( plonk[j], 'i' ) ) ) {
-					console.log( 'removing ' + id );
+
+			// TODO: clean up ugly nested logic for kill/plonk
+			outer:
+			for( var j=0; j<kill.length; j++ ) {
+				console.log( kill[j] );
+				if( kill[j] != '' && title.match( new RegExp( kill[j], 'i' ) ) ) {
+					console.log( 'removing due to kill match ' + id );
 					removeRow( killrow );			
 					// once we match, we're done
-					break;
+					break outer;
+				}
+				else {
+					for( var k=0; k<plonk.length; k++ ) {
+						if( plonk[k] != '' && user == plonk[k] ) {
+							console.log( 'removing due to plonk match ' + id );
+							removeRow( killrow );			
+							break outer;
+						}
+					}
 				}
 			}
+
 		}
 	}
 }
@@ -270,13 +289,39 @@ function addPlonkLink( text, func ) {
 }
 
 /**
+ * Show dialog for adding to kill list, save list to local
+ * storage
+ *
+ * Behavior is that clearing the text in the dialog clears the kill
+ *  filter. Hitting cancel should leave the filter unaffected. Careful
+ *  about distinguishing null from empty string.
+ */
+function modifyKillList() {
+	console.log( 'kill list' );
+	var kill = localStorage.getItem( 'kill' );
+	var userEntry = prompt( "Enter space separated list of kill terms", kill );
+	if( userEntry !== null ) {
+		kill = userEntry;
+	}
+	localStorage.setItem( 'kill', kill );
+}
+
+/**
  * Show dialog for adding to plonk list, save list to local
  * storage
+ *
+ * Behavior is that clearing the text in the dialog clears the kill
+ *  filter. Hitting cancel should leave the filter unaffected. Careful
+ *  about distinguishing null from empty string.
+ *
+ *  TODO: consolidate with modifyKillList()
  */
 function modifyPlonkList() {
 	console.log( 'plonk list' );
-	var plonk = localStorage.getItem( 'plonk' );
-	plonk = prompt( "Enter space separated list of kill terms", plonk ) || plonk;
-	console.log( plonk );
-	localStorage.setItem( 'plonk', plonk );
+	var kill = localStorage.getItem( 'plonk' );
+	var userEntry = prompt( "Enter space separated list of kill terms", kill );
+	if( userEntry !== null ) {
+		kill = userEntry;
+	}
+	localStorage.setItem( 'plonk', kill );
 }
