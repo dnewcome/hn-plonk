@@ -182,6 +182,10 @@ function onKeydown( evt ) {
 	else if( evt.keyCode == 99 ) {
 		comments();
 	}
+	// 'v' - vote 
+	else if( evt.keyCode == 118 ) {
+		uservote();
+	}
 }
 
 /**
@@ -225,6 +229,18 @@ function comments() {
 	// the third link goes to the comments for the story.
 	var link = currentrow.nextSibling.getElementsByTagName( 'a' )[2].href;
 	window.location = link;
+}
+
+/**
+ * Used by 'v' command to vote story up 
+ * we call it uservote because there is js on the page already with 'vote()'
+ */
+function uservote() {
+	var node = currentrow.getElementsByTagName( 'a' )[0];
+	console.log( 'node id: ' + node.id );
+	vote( node );
+	// var link = currentrow.children[1].getElementsByTagName( 'a' )[0].href;
+	// window.location = link;
 }
 
 /**
