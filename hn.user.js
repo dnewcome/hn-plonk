@@ -319,7 +319,7 @@ function modifyKillList() {
 function modifyPlonkList() {
 	console.log( 'plonk list' );
 	var kill = localStorage.getItem( 'plonk' );
-	var userEntry = prompt( "Enter space separated list of kill terms", kill );
+	var userEntry = prompt( "Enter space separated list of user ids", kill );
 	if( userEntry !== null ) {
 		kill = userEntry;
 	}
