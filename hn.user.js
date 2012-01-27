@@ -40,18 +40,30 @@
  * have been killed previously. Take care of highlighting the 
  * and setting the current row to the first visible story
  */
-console.log( 'running user script for hacker news' );
-document.addEventListener( 'keypress', onKeydown, false ); 
 
 // the row that is in focus for operations
+// global. bad.
 var currentrow;
 
-addPlonkLink( 'kill', modifyKillList );
-addPlonkLink( 'plonk', modifyPlonkList );
-addPlonkLink( 'reset', resetList );
-killstories();
-currentrow = findFirstRow();
-highlight( currentrow );
+/*
+ * Only activate script for /, newest, news, and x. Pagination
+ * uses the /x path with a timestamp id.
+ */
+if( window.location.pathname.match( /newest|x|news|^\/$/ ) ) {
+	main();
+}
+
+function main() {
+	console.log( 'running user script for hacker news' );
+	document.addEventListener( 'keypress', onKeydown, false ); 
+
+	addPlonkLink( 'kill', modifyKillList );
+	addPlonkLink( 'plonk', modifyPlonkList );
+	addPlonkLink( 'reset', resetList );
+	killstories();
+	currentrow = findFirstRow();
+	highlight( currentrow );
+}
 
 /**
  * remove items from the page when first loaded. We assume 30 items
