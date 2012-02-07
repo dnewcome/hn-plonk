@@ -188,6 +188,7 @@ function onKeydown( evt ) {
 	// j - move down
 	if( keyCode == 106 ) {
 		// TODO: logic for detecting end of page doesn't work 
+		// TODO: should move this check to moveDown()
 		if( currentrow.nextSibling.nextSibling.nextSibling != null ) {
 			moveDown();
 		}
@@ -196,6 +197,7 @@ function onKeydown( evt ) {
 	// k - move up
 	else if( keyCode == 107 ) {
 		// check if we are at the top
+		// TODO: should move this check to moveUp()
 		if( currentrow.previousSibling != null ) {
 			moveUp();
 		}
@@ -234,10 +236,7 @@ function kill() {
 	if( currentrow.nextSibling != null ) {
 		moveDown();
 	}
-	// TODO: use removeRow() to keep things DRY
-	currentrow.parentNode.removeChild( currentrow.previousSibling );
-	currentrow.parentNode.removeChild( currentrow.previousSibling );
-	currentrow.parentNode.removeChild( currentrow.previousSibling );
+	removePreviousRow( currentrow );
 }
 
 /**
@@ -271,9 +270,18 @@ function comments() {
 function uservote() {
 	var node = currentrow.getElementsByTagName( 'a' )[0];
 	console.log( 'node id: ' + node.id );
-	vote( node );
-	// var link = currentrow.children[1].getElementsByTagName( 'a' )[0].href;
-	// window.location = link;
+
+	// vote is not defined when we use browsers other than opera
+	// so check first
+	if( vote ) {
+		vote( node );
+
+		// move current row position down before deleting anything 
+		if( currentrow.nextSibling != null ) {
+			moveDown();
+		}
+		removePreviousRow( currentrow );
+	}
 }
 
 /**
@@ -284,6 +292,16 @@ function removeRow( el ) {
 	el.parentNode.removeChild( el.nextSibling.nextSibling );
 	el.parentNode.removeChild( el.nextSibling );
 	el.parentNode.removeChild( el );
+}
+
+/**
+ * Used by vote and kill commands to remove the row from the dom
+ * after the next row has been selected.
+ */
+function removePreviousRow( el ) {
+	el.parentNode.removeChild( el.previousSibling );
+	el.parentNode.removeChild( el.previousSibling );
+	el.parentNode.removeChild( el.previousSibling );
 }
 
 /**
