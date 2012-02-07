@@ -227,7 +227,7 @@ function onKeydown( evt ) {
  * Used by 'x' command to kill a story
  */
 function kill() {
-	var id = currentrow.getElementsByTagName( 'a' )[0].id;
+	var id = getStoryId( currentrow );
 	// using 'true' here - this is arbitrary, all
 	// we check is existence of the key in the store
 	localStorage.setItem( id, 'true' );
@@ -240,13 +240,40 @@ function kill() {
 }
 
 /**
- * Used by 'enter' command to browse to a story 
+ * Various methods for pulling data out of the HN html.
+ * el refers to the first of the 3 <tr>s that make
+ * up an entry always.
  */
-function browse() {
+function getStoryId( el ) {
+	return el.getElementsByTagName( 'a' )[0].id;
+}
+function getStoryLink( el ) {
 	// big hairy dom traversal - we have to go specifically to third 
 	// child rather than just pulling all anchor elements since if a 
 	// story is voted up, the link count will be off.
-	var link = currentrow.children[2].getElementsByTagName( 'a' )[0].href;
+	// var link = currentrow.children[2].getElementsByTagName( 'a' )[0].href;
+	return el.children[2].getElementsByTagName( 'a' )[0].href;
+}
+function getCommentLink( el ) {
+	// the comments are in the 'subtext' line, which immediately follows
+	// the main subject line and consists
+	// of 3 links always (I think, if you flag a story, the link is replaced
+	// by an 'unflag' option, so the number of links is consistent.)
+	// the third link goes to the comments for the story.
+	return el.nextSibling.getElementsByTagName( 'a' )[2].href;
+}
+function getVotingLink( el ) {
+	return el.getElementsByTagName( 'a' )[0];
+}
+function getHeaderBar() {
+	return document.getElementsByClassName( 'pagetop' )[0];
+}
+
+/**
+ * Used by 'enter' command to browse to a story 
+ */
+function browse() {
+	var link = getStoryLink( currentrow );
 	window.location = link;
 }
 
@@ -254,12 +281,8 @@ function browse() {
  * Used by 'c' command to browse to comments 
  */
 function comments() {
-	// the comments are in the 'subtext' line, which immediately follows
-	// the main subject line and consists
-	// of 3 links always (I think, if you flag a story, the link is replaced
-	// by an 'unflag' option, so the number of links is consistent.)
-	// the third link goes to the comments for the story.
-	var link = currentrow.nextSibling.getElementsByTagName( 'a' )[2].href;
+	//var link = currentrow.nextSibling.getElementsByTagName( 'a' )[2].href;
+	var link = getCommentLink( currentrow );
 	window.location = link;
 }
 
@@ -268,7 +291,8 @@ function comments() {
  * we call it uservote because there is js on the page already with 'vote()'
  */
 function uservote() {
-	var node = currentrow.getElementsByTagName( 'a' )[0];
+	// var node = currentrow.getElementsByTagName( 'a' )[0];
+	var node = getVotingLink( currentrow );
 	console.log( 'node id: ' + node.id );
 
 	// vote is not defined when we use browsers other than opera
@@ -304,11 +328,12 @@ function removePreviousRow( el ) {
 	el.parentNode.removeChild( el.previousSibling );
 }
 
+
 /**
  * Insert link in page header for killfile list
  */
 function addPlonkLink( text, func ) {
-	var header = document.getElementsByClassName( 'pagetop' )[0];
+	var header = getHeaderBar();
 	var separator = document.createTextNode( ' | ' );
 	var link = document.createElement( 'a' );
 	link.innerHTML = text;
