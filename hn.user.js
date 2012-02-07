@@ -35,11 +35,13 @@
  * and setting the current row to the first visible story
  */
 
-// the row that is in focus for operations
-// global. bad.
+/** 
+ * the row that is in focus for operations
+ * global. bad.
+ */
 var currentrow;
 
-/*
+/**
  * Only activate script for /, newest, news, and x. Pagination
  * uses the /x path with a timestamp id.
  */
@@ -73,9 +75,7 @@ function killstories() {
 		var id = null;
 		moveDown();
 		
-		if( killrow.getElementsByTagName( 'a' )[0] ) {
-			var id = killrow.getElementsByTagName( 'a' )[0].id;
-		}
+		var id = getStoryId( killrow );
 		console.log( 'story id ' + id );
 		var item = localStorage.getItem( id );
 
@@ -93,11 +93,11 @@ function killstories() {
 		
 		else {
 			// check if story matches killfile 
-			var title = killrow.getElementsByTagName( 'a' )[1].innerHTML;
+			var title = getStoryTitle( killrow );
 			var kill = ( localStorage.getItem( 'kill' ) || '' ).split( ' ' );
 
 			// check if story matches plonkfile 
-			var user = killrow.nextSibling.getElementsByTagName( 'a' )[0].innerHTML;
+			var user = getStoryUser( killrow );
 			console.log( 'looking at user ' + user );
 			var plonk = ( localStorage.getItem( 'plonk' ) || '' ).split( ' ' );
 
@@ -146,7 +146,7 @@ function moveUp() {
  * a DOM element somewhat
  */
 function highlight( el ) {
-	el.style.backgroundColor = 'white';
+	el.style.backgroundColor = "rgba(255,102,0,0.3)"
 }
 function unhighlight( el ) {
 	el.style.backgroundColor = null;
@@ -237,9 +237,21 @@ function kill() {
  * Various methods for pulling data out of the HN html.
  * el refers to the first of the 3 <tr>s that make
  * up an entry always.
+ * System stories don't have IDs, so check first.
  */
 function getStoryId( el ) {
-	return el.getElementsByTagName( 'a' )[0].id;
+	if( el.getElementsByTagName( 'a' )[0] ) { 
+		return el.getElementsByTagName( 'a' )[0].id;
+	}
+	else {
+		return null;
+	}
+}
+function getStoryTitle( el ) {
+	return el.getElementsByTagName( 'a' )[1].innerHTML;
+}
+function getStoryUser( el ) {
+	return el.nextSibling.getElementsByTagName( 'a' )[0].innerHTML;
 }
 function getStoryLink( el ) {
 	// big hairy dom traversal - we have to go specifically to third 
@@ -275,7 +287,6 @@ function browse() {
  * Used by 'c' command to browse to comments 
  */
 function comments() {
-	//var link = currentrow.nextSibling.getElementsByTagName( 'a' )[2].href;
 	var link = getCommentLink( currentrow );
 	window.location = link;
 }
@@ -285,7 +296,6 @@ function comments() {
  * we call it uservote because there is js on the page already with 'vote()'
  */
 function uservote() {
-	// var node = currentrow.getElementsByTagName( 'a' )[0];
 	var node = getVotingLink( currentrow );
 	console.log( 'node id: ' + node.id );
 
