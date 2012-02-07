@@ -21,12 +21,6 @@
  * other scripts that do this:
  * http://news.ycombinator.com/item?id=277099
  * http://www.hnsearch.com/search#request/submissions&q=hacker+bookmarklet&start=0
- * 
- * BUG: browsing to articles that have been upvoted results in 
- *  viewing the submitter's profile rather than the intended action
- * BUG: Voting a story up and then trying to browse to another story
- *  results in trying to vote for the same story again.
- * BUG: Key commands should be disabled when commenting
  *
  * Browser support -
  *  Tested now on Opera, Firefox and Chrome. Voting function only works 
