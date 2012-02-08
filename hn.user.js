@@ -18,6 +18,8 @@
  * TODO: scroll down when moving selection below the fold
  * TODO: Temporarily disable killed stories, to ressurect?
  *
+ * BUG: Highlighted selection can disappear off the bottom of the page
+ *
  * other scripts that do this:
  * http://news.ycombinator.com/item?id=277099
  * http://www.hnsearch.com/search#request/submissions&q=hacker+bookmarklet&start=0
@@ -95,33 +97,32 @@ function killstories() {
 			// check if story matches killfile 
 			var title = getStoryTitle( killrow );
 			var kill = ( localStorage.getItem( 'kill' ) || '' ).split( ' ' );
+			var killflag = false;
 
 			// check if story matches plonkfile 
 			var user = getStoryUser( killrow );
 			console.log( 'looking at user ' + user );
 			var plonk = ( localStorage.getItem( 'plonk' ) || '' ).split( ' ' );
 
-			// TODO: clean up ugly nested logic for kill/plonk
-			outer:
 			for( var j=0; j<kill.length; j++ ) {
 				console.log( kill[j] );
 				if( kill[j] != '' && title.match( new RegExp( kill[j], 'i' ) ) ) {
 					console.log( 'removing due to kill match ' + id );
-					removeRow( killrow );			
+					killflag = true;	
 					// once we match, we're done
-					break outer;
-				}
-				else {
-					for( var k=0; k<plonk.length; k++ ) {
-						if( plonk[k] != '' && user == plonk[k] ) {
-							console.log( 'removing due to plonk match ' + id );
-							removeRow( killrow );			
-							break outer;
-						}
-					}
+					break; 
 				}
 			}
-
+			for( var k=0; k<plonk.length; k++ ) {
+				if( plonk[k] != '' && user == plonk[k] ) {
+					console.log( 'removing due to plonk match ' + id );
+					killflag = true;
+					break;
+				}
+			}
+			if( killflag == true ) {
+				removeRow( killrow );			
+			}
 		}
 	}
 }
