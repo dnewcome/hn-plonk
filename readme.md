@@ -1,12 +1,17 @@
 # About
 
-Hacker News Plonk is a user script that can filter out stories on Hacker News. Plonk is a term from the Usenet news reader 
+Hacker News Plonk is a browser user script that filters and removes stories on Hacker News. It 
+gives you convenient keyboard shortcuts for navigating and processing stories. 
+
+![](http://github.com/dnewcome/hn-plonk/raw/master/hnplonk.png)
+
+I wanted to have a way to ignore certain stories or just kill ones that I'm 
+not interested in. Hacker News Plonk allows you to read down through the front page kind of like
+an inbox, touching the list just once, deleting, reading or voting on the story.
+
+The term plonk comes from the Usenet news reader 
 days where most user agents were able to filter out postings from certain users via a killfile
 maintained by the reader.
-
-I've wanted to have a way to ignore certain stories for a while or just kill certain ones that I'm 
-not interested in. Hacker News Plonk allows you to read down through the front page kind of like
-an email inbox, where you just touch the list once, deleting, reading or voting on the story.
 
 # Installation
 
@@ -17,7 +22,9 @@ user.js scripts from. Specify the directory and just drop hn.user.js there and O
 
 # Usage
 
-HN Plonk uses VIM-style keyboard commands in addition to adding three new links at the top of the page. The links are 
+HN Plonk uses VIM-style keyboard commands in addition to adding three new links at the top of the page. 
+
+## Menu links
 
 ### kill 
 Prompts you to enter a space-separated list of kill filters that operate on the story title. 
@@ -30,7 +37,8 @@ treated as regular expressions.
 ### reset 
 Clears local storage for news.ycombinator.com, effectively clearing all filters.
 
-The key commands are:
+
+## Key commands
 
 ### x 
 Kill an individual story. This stores the story ID in HTML5 local storage. When Hacker News loads, the 
