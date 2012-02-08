@@ -82,6 +82,10 @@ function killstories() {
 		var kill = ( localStorage.getItem( 'kill' ) || '' ).split( ' ' );
 		var plonk = ( localStorage.getItem( 'plonk' ) || '' ).split( ' ' );
 
+		if( isMyStory( killrow ) ) {
+			continue;
+		}
+
 		// voted or 'sponsored' story.
 		if( !id ) {
 			console.log( 'removing item without voting link' );
@@ -246,6 +250,17 @@ function getStoryId( el ) {
 	}
 	else {
 		return null;
+	}
+}
+/**
+ * Test to see if this story was submitted by logged-in user
+ */
+function isMyStory( el ) {
+	if( el.getElementsByTagName( 'font' ).length > 0 && el.getElementsByTagName( 'font' )[0].innerHTML == "*" ) { 
+		return true;
+	}
+	else {
+		return false;
 	}
 }
 function getStoryTitle( el ) {
