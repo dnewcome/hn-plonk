@@ -58,61 +58,58 @@ function main() {
 	addPlonkLink( 'kill', modifyKillList );
 	addPlonkLink( 'plonk', modifyPlonkList );
 	addPlonkLink( 'reset', resetList );
+
 	killstories();
+
 	currentrow = findFirstRow();
 	highlight( currentrow );
 }
 
 /**
- * remove items from the page when first loaded. We assume 30 items
- * per page. Look up the story id and see if it exists in the local
- * storage data.
+ * remove items from the page when first loaded. 
+ * We assume 30 items per page.
  */
 function killstories() {
-	// start at the top
 	currentrow = findFirstRow();
 
 	for( var i=0; i<30; i++ ) {
 		var killrow = currentrow;
-		var id = null;
-		moveDown();
-		
+		var killflag = false;
 		var id = getStoryId( killrow );
-		console.log( 'story id ' + id );
 		var item = localStorage.getItem( id );
+		moveDown();
 
-		// if an item doesn't have a vote flag, kill it. It is already 
-		// voted or is a system message
+		var kill = ( localStorage.getItem( 'kill' ) || '' ).split( ' ' );
+		var plonk = ( localStorage.getItem( 'plonk' ) || '' ).split( ' ' );
+
+		// voted or 'sponsored' story.
 		if( !id ) {
 			console.log( 'removing item without voting link' );
-			removeRow( killrow );			
+			killflag = true;	
 		}
-		// check if story was killed by id
+
+		// story was killed by id
 		else if( item ) {
-			console.log( 'removing ' + id );
-			removeRow( killrow );			
+			console.log( 'removing by id ' + id );
+			killflag = true;	
 		}
 		
 		else {
-			// check if story matches killfile 
 			var title = getStoryTitle( killrow );
-			var kill = ( localStorage.getItem( 'kill' ) || '' ).split( ' ' );
-			var killflag = false;
-
-			// check if story matches plonkfile 
 			var user = getStoryUser( killrow );
-			console.log( 'looking at user ' + user );
-			var plonk = ( localStorage.getItem( 'plonk' ) || '' ).split( ' ' );
 
+
+			// check if story matches killfile 
 			for( var j=0; j<kill.length; j++ ) {
 				console.log( kill[j] );
 				if( kill[j] != '' && title.match( new RegExp( kill[j], 'i' ) ) ) {
 					console.log( 'removing due to kill match ' + id );
 					killflag = true;	
-					// once we match, we're done
 					break; 
 				}
 			}
+
+			// check if story matches plonkfile 
 			for( var k=0; k<plonk.length; k++ ) {
 				if( plonk[k] != '' && user == plonk[k] ) {
 					console.log( 'removing due to plonk match ' + id );
@@ -120,9 +117,12 @@ function killstories() {
 					break;
 				}
 			}
-			if( killflag == true ) {
-				removeRow( killrow );			
-			}
+
+		}
+
+		// do the deed
+		if( killflag == true ) {
+			removeRow( killrow );			
 		}
 	}
 }
