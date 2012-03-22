@@ -37,6 +37,8 @@
  * and setting the current row to the first visible story
  */
 
+console.log( 'loading user script for hacker news' );
+
 /** 
  * the row that is in focus for operations
  * global. bad.
@@ -48,16 +50,24 @@ var currentrow;
  * uses the /x path with a timestamp id.
  */
 if( window.location.pathname.match( /newest|x|news|^\/$/ ) ) {
-	main();
+	__main();
 }
 
-function main() {
+/*
+ * Main function is prefixed here. It's bad form to have all
+ * of these functions out in the main namespace, but for some
+ * reason opera loads user scripts for local files and I get 
+ * conflicts sometimes.
+ */
+function __main() {
 	console.log( 'running user script for hacker news' );
+	console.log( window.location.hostname );
 	document.addEventListener( 'keypress', onKeydown, false ); 
 
 	addPlonkLink( 'kill', modifyKillList );
 	addPlonkLink( 'plonk', modifyPlonkList );
 	addPlonkLink( 'reset', resetList );
+	addPlonkLink( 'toggle', toggleScript );
 
 	killstories();
 
@@ -70,6 +80,10 @@ function main() {
  * We assume 30 items per page.
  */
 function killstories() {
+
+	var enabled = localStorage.getItem( 'enabled' );
+	if( enabled == 'false' ) return;
+
 	currentrow = findFirstRow();
 
 	for( var i=0; i<30; i++ ) {
@@ -379,6 +393,25 @@ function modifyKillList() {
 		kill = userEntry;
 	}
 	localStorage.setItem( 'kill', kill );
+}
+
+/**
+ * Toggle filtering on and off
+ *
+ * TODO: should put some visual indication
+ * 	of state - greyed out, etc.
+ */
+function toggleScript () {
+	var enabled = localStorage.getItem( 'enabled' );
+	if( enabled == 'true' ) {
+		enabled = 'false';
+	}
+	else {
+		enabled = 'true';
+	}
+	localStorage.setItem( 'enabled', enabled );
+	console.log( enabled );
+	window.location.reload();
 }
 
 /**
